@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from "react";
+import React, { useState, createContext, useEffect, useCallback } from "react";
 import { convertDate } from "../utilities/Date";
 
 const LocationContext = createContext();
@@ -14,49 +14,7 @@ const LocationProvider = (props) => {
   const [locationData, setLocationData] = useState({});
   const [tempUnit, setTempUnit] = useState("imperial");
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        let currentLon = position.coords.longitude;
-        let currentLat = position.coords.latitude;
-        console.log(`Getting Location: ${currentLat}, ${currentLon}`);
-        setCurrentLoc({
-          latitude: currentLat,
-          longitude: currentLon,
-        });
-        setDataType("LOCAL");
-        searchWeather(currentLat, currentLon, "", tempUnit);
-      });
-    } else {
-      console.log("Error getting location data");
-    }
-  }, []);
-
-  const findWindDirection = (degree) => {
-    let direction = "";
-
-    if (degree <= 15 || degree > 345) {
-      direction = "N";
-    } else if (degree > 15 && degree <= 75) {
-      direction = "NE";
-    } else if (degree > 75 && degree <= 105) {
-      direction = "E";
-    } else if (degree > 105 && degree <= 165) {
-      direction = "SE";
-    } else if (degree > 165 && degree <= 195) {
-      direction = "S";
-    } else if (degree > 195 && degree <= 255) {
-      direction = "SW";
-    } else if (degree > 255 && degree <= 285) {
-      direction = "W";
-    } else if (degree > 285 && degree <= 345) {
-      direction = "NW";
-    }
-
-    return direction;
-  };
-
-  const searchWeather = (latitude, longitude, name, unit) => {
+  const searchWeather = useCallback((latitude, longitude, name, unit) => {
     fetch(
       `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${process.env.REACT_APP_OPENWEATHERMAP_API_KEY}&units=${unit}`
     )
@@ -80,6 +38,48 @@ const LocationProvider = (props) => {
           icon: `http://openweathermap.org/img/wn/${json.current.weather[0].icon}.png`,
         });
       });
+  }, []);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        let currentLon = position.coords.longitude;
+        let currentLat = position.coords.latitude;
+        console.log(`Getting Location: ${currentLat}, ${currentLon}`);
+        setCurrentLoc({
+          latitude: currentLat,
+          longitude: currentLon,
+        });
+        setDataType("LOCAL");
+        searchWeather(currentLat, currentLon, "", tempUnit);
+      });
+    } else {
+      console.log("Error getting location data");
+    }
+  }, [tempUnit, searchWeather]);
+
+  const findWindDirection = (degree) => {
+    let direction = "";
+
+    if (degree <= 15 || degree > 345) {
+      direction = "N";
+    } else if (degree > 15 && degree <= 75) {
+      direction = "NE";
+    } else if (degree > 75 && degree <= 105) {
+      direction = "E";
+    } else if (degree > 105 && degree <= 165) {
+      direction = "SE";
+    } else if (degree > 165 && degree <= 195) {
+      direction = "S";
+    } else if (degree > 195 && degree <= 255) {
+      direction = "SW";
+    } else if (degree > 255 && degree <= 285) {
+      direction = "W";
+    } else if (degree > 285 && degree <= 345) {
+      direction = "NW";
+    }
+
+    return direction;
   };
 
   const toggleTempUnit = () => {

@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { LocationContext } from "../context/LocationContext";
 
 const MainCard = () => {
