@@ -15,12 +15,13 @@ const LocationProvider = (props) => {
   const [tempUnit, setTempUnit] = useState("imperial");
 
   const searchWeather = useCallback((latitude, longitude, name, unit) => {
+    /* fetch(`.netlify/functions/fetch-weather?lat=${latitude}&lon=${longitude}&unit=${unit}) */
     fetch(
-      `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${process.env.REACT_APP_OPENWEATHERMAP_API_KEY}&units=${unit}`
+      // `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${process.env.REACT_APP_OPENWEATHERMAP_API_KEY}&units=${unit}`
+      `api/fetch-weather?lat=${latitude}&lon=${longitude}&unit=${unit}`
     )
       .then((response) => response.json())
       .then((json) => {
-        console.log(json);
         setLocationData({
           data: json.results,
           weeklyForecast: json.daily,
