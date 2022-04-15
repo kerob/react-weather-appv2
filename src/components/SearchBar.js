@@ -58,7 +58,6 @@ const SearchBar = () => {
       }, []);
     }
 
-    console.log(filteredMatches);
     setLocationSearch(filteredMatches);
   };
 
